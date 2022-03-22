@@ -1,0 +1,1 @@
+net user test wxy0715wxy /add1
