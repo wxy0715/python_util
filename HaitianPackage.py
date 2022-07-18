@@ -19,7 +19,7 @@ from paramiko import SSHClient
 
 prodIp = '192.168.1.80'
 devIp = '192.168.2.10'
-cmd = '"D:\\Program Files\\jdk1.8.0_201\\bin\\java.exe" -Dmaven.multiModuleProjectDirectory=D:\\HaiTian\\预算中台\\budgetmiddleoffice\\ServiceSite "-Dmaven.home=D:\\Program Files\\apache-maven-3.5.4" "-Dclassworlds.conf=D:\\Program Files\\apache-maven-3.5.4\\bin\\m2.conf" "-Dmaven.ext.class.path=D:\\Program Files\\idea\\IntelliJ IDEA 2019.3.3\\plugins\\maven\\lib\\maven-event-listener.jar" "-javaagent:D:\\Program Files\\idea\\IntelliJ IDEA 2019.3.3\\lib\\idea_rt.jar=50834:D:\\Program Files\\idea\\IntelliJ IDEA 2019.3.3\\bin" -Dfile.encoding=UTF-8 -classpath "D:\\Program Files\\apache-maven-3.5.4\\boot\\plexus-classworlds-2.5.2.jar" org.codehaus.classworlds.Launcher -Didea.version2019.3.3 -s "D:\\Program Files\\apache-maven-3.5.4\\conf\\settings.xml" "-Dmaven.repo.local=D:\\Program Files\\maven\\apache-maven-3.5.4\\repository" clean package docker:build'
+cmd = '"D:\\Program Files\\jdk1.8.0_201\\bin\\java.exe" -Dmaven.multiModuleProjectDirectory=packageClientFilePath "-Dmaven.home=D:\\Program Files\\apache-maven-3.5.4" "-Dclassworlds.conf=D:\\Program Files\\apache-maven-3.5.4\\bin\\m2.conf" "-Dmaven.ext.class.path=D:\\Program Files\\idea\\IntelliJ IDEA 2019.3.3\\plugins\\maven\\lib\\maven-event-listener.jar" "-javaagent:D:\\Program Files\\idea\\IntelliJ IDEA 2019.3.3\\lib\\idea_rt.jar=50834:D:\\Program Files\\idea\\IntelliJ IDEA 2019.3.3\\bin" -Dfile.encoding=UTF-8 -classpath "D:\\Program Files\\apache-maven-3.5.4\\boot\\plexus-classworlds-2.5.2.jar" org.codehaus.classworlds.Launcher -Didea.version2019.3.3 -s "D:\\Program Files\\apache-maven-3.5.4\\conf\\settings.xml" "-Dmaven.repo.local=D:\\Program Files\\maven\\apache-maven-3.5.4\\repository" clean package docker:build'
 # 打包项目列表
 packageList = ["budgetmiddleoffice", "budgetmaster", "projectplan_gzy", "projectplan_origin", "adjust"]
 packageIp = prodIp
@@ -70,6 +70,26 @@ class budgetmiddleoffice:
             exit(0)
         stdin, stdout, stderr = ssh.exec_command("docker images")
         print(stdout.read().decode().strip())
+        # 更新服务
+        pushCmd = "docker service update --image demo.seaskysh.com/seaskysh/budgetmiddleoffice:" + self.getImage() +" --force budgetmiddleoffice-service_budgetmiddleoffice"
+        print("更新服务:" + pushCmd)
+        stdin, stdout, stderr = ssh.exec_command(pushCmd)
+        res, err = stdout.read(), stderr.read()
+        if res:
+            print(res.decode().strip())
+        else:
+            print(err)
+            exit(0)
+
+        # 清理空间
+        print("清理空间")
+        stdin, stdout, stderr = ssh.exec_command("docker system prune -a -f")
+        res, err = stdout.read(), stderr.read()
+        if res:
+            print(res.decode().strip())
+        else:
+            print(err)
+            exit(0)
         # 关闭连接
         ssh.close()
 
@@ -93,6 +113,7 @@ class budgetmiddleoffice:
             exit(0)
         # 关闭连接
         ssh.close()
+
 
     def getImage(self):
         os.chdir(budgetmiddleofficePath)
@@ -141,6 +162,26 @@ class budgetmaster:
 
             stdin, stdout, stderr = ssh.exec_command("docker images")
             print(stdout.read().decode().strip())
+            # 更新服务
+            pushCmd = "docker service update --image demo.seaskysh.com/seaskysh/budget-quota:" + self.getImage() + " --force budgetquota-service_budgetmaster-provider"
+            print("更新服务:" + pushCmd)
+            stdin, stdout, stderr = ssh.exec_command(pushCmd)
+            res, err = stdout.read(), stderr.read()
+            if res:
+                print(res.decode().strip())
+            else:
+                print(err)
+                exit(0)
+
+            # 清理空间
+            print("清理空间")
+            stdin, stdout, stderr = ssh.exec_command("docker system prune -a -f")
+            res, err = stdout.read(), stderr.read()
+            if res:
+                print(res.decode().strip())
+            else:
+                print(err)
+                exit(0)
             # 关闭连接
             ssh.close()
 
@@ -211,6 +252,26 @@ class projectplan_gzy:
 
                 stdin, stdout, stderr = ssh.exec_command("docker images")
                 print(stdout.read().decode().strip())
+                # 更新服务
+                pushCmd = "docker service update --image demo.seaskysh.com/seaskysh/projectplan-gzy:" + self.getImage() + " --force projectplangzy-service_projectplangzy"
+                print("更新服务:" + pushCmd)
+                stdin, stdout, stderr = ssh.exec_command(pushCmd)
+                res, err = stdout.read(), stderr.read()
+                if res:
+                    print(res.decode().strip())
+                else:
+                    print(err)
+                    exit(0)
+
+                # 清理空间
+                print("清理空间")
+                stdin, stdout, stderr = ssh.exec_command("docker system prune -a -f")
+                res, err = stdout.read(), stderr.read()
+                if res:
+                    print(res.decode().strip())
+                else:
+                    print(err)
+                    exit(0)
                 # 关闭连接
                 ssh.close()
 
@@ -281,6 +342,26 @@ class projectplan:
 
         stdin, stdout, stderr = ssh.exec_command("docker images")
         print(stdout.read().decode().strip())
+        # 更新服务
+        pushCmd = "docker service update --image demo.seaskysh.com/seaskysh/projectplan:" + self.getImage() +" --force projectplan-service_project-plan"
+        print("更新服务:" + pushCmd)
+        stdin, stdout, stderr = ssh.exec_command(pushCmd)
+        res, err = stdout.read(), stderr.read()
+        if res:
+            print(res.decode().strip())
+        else:
+            print(err)
+            exit(0)
+
+        # 清理空间
+        print("清理空间")
+        stdin, stdout, stderr = ssh.exec_command("docker system prune -a -f")
+        res, err = stdout.read(), stderr.read()
+        if res:
+            print(res.decode().strip())
+        else:
+            print(err)
+            exit(0)
         # 关闭连接
         ssh.close()
 
@@ -351,6 +432,26 @@ class adjust:
 
         stdin, stdout, stderr = ssh.exec_command("docker images")
         print(stdout.read().decode().strip())
+        # 更新服务
+        pushCmd = "docker service update --image demo.seaskysh.com/seaskysh/adjustproject:" + self.getImage() +" --force adjustproject-service_adjustproject"
+        print("更新服务:" + pushCmd)
+        stdin, stdout, stderr = ssh.exec_command(pushCmd)
+        res, err = stdout.read(), stderr.read()
+        if res:
+            print(res.decode().strip())
+        else:
+            print(err)
+            exit(0)
+
+        # 清理空间
+        print("清理空间")
+        stdin, stdout, stderr = ssh.exec_command("docker system prune -a -f")
+        res, err = stdout.read(), stderr.read()
+        if res:
+            print(res.decode().strip())
+        else:
+            print(err)
+            exit(0)
         # 关闭连接
         ssh.close()
 
@@ -373,6 +474,7 @@ class adjust:
             exit(0)
         # 关闭连接
         ssh.close()
+
 
     def getImage(self):
         os.chdir(adjustPath)
